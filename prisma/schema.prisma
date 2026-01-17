@@ -1,0 +1,124 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// =====================================================
+// USER & AUTHENTICATION
+// =====================================================
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String?
+  passwordHash String    @map("password_hash")
+  avatarUrl    String?   @map("avatar_url")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  
+  // Relations
+  favorites    Favorite[]
+  ratings      Rating[]
+
+  @@index([email])
+  @@map("users")
+}
+
+// =====================================================
+// GREEN SPACES (OSM DATA)
+// =====================================================
+
+model GreenSpace {
+  id        BigInt   @id @default(autoincrement())
+  osmId     BigInt   @unique @map("osm_id")
+  osmType   String   @map("osm_type") @db.VarChar(10) // 'node', 'way', 'relation'
+  name      String?  @db.VarChar(255)
+  type      String   @db.VarChar(50) // 'park', 'forest', 'garden', etc.
+  geometry  Json     // GeoJSON coordinates
+  areaSqkm  Decimal? @map("area_sqkm") @db.Decimal(10, 4)
+  district  String?  @db.VarChar(100)
+  city      String?  @db.VarChar(100)
+  metadata  Json?    // Extra OSM tags
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  favorites Favorite[]
+  ratings   Rating[]
+
+  @@index([osmId])
+  @@index([type])
+  @@index([district])
+  @@map("green_spaces")
+}
+
+// =====================================================
+// USER FAVORITES
+// =====================================================
+
+model Favorite {
+  id           BigInt   @id @default(autoincrement())
+  userId       String   @map("user_id")
+  greenSpaceId BigInt   @map("green_space_id")
+  osmId        BigInt   @map("osm_id")
+  name         String?  @db.VarChar(255)
+  coordinates  Json     // [lat, lng]
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  greenSpace GreenSpace @relation(fields: [greenSpaceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, greenSpaceId])
+  @@index([userId])
+  @@index([osmId])
+  @@map("favorites")
+}
+
+// =====================================================
+// RATINGS & REVIEWS
+// =====================================================
+
+model Rating {
+  id           BigInt   @id @default(autoincrement())
+  userId       String   @map("user_id")
+  greenSpaceId BigInt   @map("green_space_id")
+  osmId        BigInt   @map("osm_id")
+  rating       Int      @db.SmallInt // 1-5
+  comment      String?  @db.Text
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  greenSpace GreenSpace @relation(fields: [greenSpaceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, greenSpaceId])
+  @@index([userId])
+  @@index([greenSpaceId])
+  @@index([rating])
+  @@map("ratings")
+}
+
+// =====================================================
+// DISTRICT REFERENCE DATA
+// =====================================================
+
+model District {
+  id            Int      @id @default(autoincrement())
+  name          String   @db.VarChar(100)
+  city          String   @db.VarChar(100)
+  bbox          Json     // Bounding box: { south, west, north, east }
+  totalAreaSqkm Decimal? @map("total_area_sqkm") @db.Decimal(10, 2)
+  population    Int?
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@index([city])
+  @@map("districts")
+}
