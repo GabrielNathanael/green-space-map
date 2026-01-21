@@ -1,15 +1,39 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+/* Shadcn color variables */
+@theme inline {
+  /* Base colors (existing) */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-outfit), var(--font-inter), ui-sans-serif, system-ui;
+  --font-mono: var(--font-geist-mono);
+  --font-outfit: var(--font-outfit);
+  --font-inter: var(--font-inter);
+
+  /* Shadcn color system */
+  --color-card: 0 0% 100%;
+  --color-card-foreground: 222.2 84% 4.9%;
+  --color-popover: 0 0% 100%;
+  --color-popover-foreground: 222.2 84% 4.9%;
+  --color-primary: 142 71% 45%; /* Green theme for GreenSpaceMap */
+  --color-primary-foreground: 0 0% 100%;
+  --color-secondary: 210 40% 96.1%;
+  --color-secondary-foreground: 222.2 47.4% 11.2%;
+  --color-muted: 210 40% 96.1%;
+  --color-muted-foreground: 215.4 16.3% 46.9%;
+  --color-accent: 210 40% 96.1%;
+  --color-accent-foreground: 222.2 47.4% 11.2%;
+  --color-destructive: 0 84.2% 60.2%;
+  --color-destructive-foreground: 210 40% 98%;
+  --color-border: 214.3 31.8% 91.4%;
+  --color-input: 214.3 31.8% 91.4%;
+  --color-ring: 142 71% 45%;
+  --radius: 0.5rem;
+}
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -17,10 +41,92 @@
     --background: #0a0a0a;
     --foreground: #ededed;
   }
+
+  @theme inline {
+    --color-card: 222.2 84% 4.9%;
+    --color-card-foreground: 210 40% 98%;
+    --color-popover: 222.2 84% 4.9%;
+    --color-popover-foreground: 210 40% 98%;
+    --color-primary: 142 71% 45%;
+    --color-primary-foreground: 0 0% 100%;
+    --color-secondary: 217.2 32.6% 17.5%;
+    --color-secondary-foreground: 210 40% 98%;
+    --color-muted: 217.2 32.6% 17.5%;
+    --color-muted-foreground: 215 20.2% 65.1%;
+    --color-accent: 217.2 32.6% 17.5%;
+    --color-accent-foreground: 210 40% 98%;
+    --color-destructive: 0 62.8% 30.6%;
+    --color-destructive-foreground: 210 40% 98%;
+    --color-border: 217.2 32.6% 17.5%;
+    --color-input: 217.2 32.6% 17.5%;
+    --color-ring: 142 71% 45%;
+  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Custom styles for Leaflet map */
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  z-index: 0;
+}
+
+/* Ensure map controls are above map but below modals */
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 400;
+}
+
+.leaflet-pane {
+  z-index: 400;
+}
+
+.leaflet-popup {
+  z-index: 600;
+}
+
+/* Custom Responsive Map Popup */
+.custom-leaflet-popup .leaflet-popup-content-wrapper {
+  background: var(--background);
+  color: var(--foreground);
+  border-radius: 1rem;
+  padding: 0;
+  overflow: hidden;
+  box-shadow:
+    0 10px 25px -5px rgba(0, 0, 0, 0.1),
+    0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border);
+}
+
+.custom-leaflet-popup .leaflet-popup-content {
+  margin: 0;
+  width: auto !important;
+}
+
+.custom-leaflet-popup .leaflet-popup-tip-container {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .custom-leaflet-popup {
+    margin-bottom: 20px;
+  }
+  .custom-leaflet-popup .leaflet-popup-content-wrapper {
+    max-width: 85vw !important;
+    margin: 0 auto;
+  }
+}
+
+/* Hide scrollbar for horizontal chips */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

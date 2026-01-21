@@ -16,13 +16,36 @@ export class GreenSpaceService {
   private static CACHE_TTL = 3600;
 
   /**
+   * Round coordinate to 3 decimal places (~110m precision)
+   */
+  private static roundCoordinate(coord: number): number {
+    return Math.round(coord * 1000) / 1000;
+  }
+
+  /**
+   * Round bbox for better cache hit rate
+   */
+  private static roundBbox(bbox: string): string {
+    const [south, west, north, east] = bbox.split(",").map(Number);
+    return [
+      this.roundCoordinate(south),
+      this.roundCoordinate(west),
+      this.roundCoordinate(north),
+      this.roundCoordinate(east),
+    ].join(",");
+  }
+
+  /**
    * Get green spaces by bounding box
    */
   static async getGreenSpaces(input: QueryGreenSpacesInput) {
     const { bbox, type, limit, useCache } = input;
 
+    // Round bbox for cache
+    const roundedBbox = this.roundBbox(bbox);
+
     // Generate cache key
-    const cacheKey = `greenspaces:${bbox}:${type}:${limit}`;
+    const cacheKey = `greenspaces:${roundedBbox}:${type}:${limit}`;
 
     // Try cache first if enabled
     if (useCache) {
@@ -63,7 +86,7 @@ export class GreenSpaceService {
     // Calculate total area
     const totalArea = limitedFeatures.reduce(
       (sum: number, f) => sum + (f.properties.areaSqkm || 0),
-      0
+      0,
     );
 
     // Cache the result
@@ -134,7 +157,7 @@ export class GreenSpaceService {
         }
         throw new ExternalServiceError(
           "Overpass API",
-          "Failed to fetch green space details"
+          "Failed to fetch green space details",
         );
       }
     }
@@ -150,7 +173,7 @@ export class GreenSpaceService {
       ratings.length > 0
         ? ratings.reduce(
             (sum: number, r: { rating: number }) => sum + r.rating,
-            0
+            0,
           ) / ratings.length
         : 0;
 
