@@ -6,14 +6,14 @@ import type { Geometry } from "@/types/greenspace";
  */
 export function calculateCentroid(geometry: Geometry): [number, number] {
   if (geometry.type === "Polygon") {
-    return getPolygonCentroid(geometry.coordinates[0]);
+    return getPolygonCentroid(geometry.coordinates[0] as [number, number][]);
   } else if (geometry.type === "MultiPolygon") {
     // Get centroid of first polygon
-    return getPolygonCentroid(geometry.coordinates[0][0]);
+    return getPolygonCentroid(geometry.coordinates[0][0] as [number, number][]);
   }
 
   // Fallback to first coordinate
-  return geometry.coordinates[0][0] as [number, number];
+  return geometry.coordinates[0][0] as unknown as [number, number];
 }
 
 /**

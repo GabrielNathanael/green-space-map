@@ -2,6 +2,11 @@
  * Green Space Types (from Overpass API)
  */
 
+export interface Geometry {
+  type: "Polygon" | "MultiPolygon";
+  coordinates: number[][][] | number[][][][];
+}
+
 export interface GreenSpaceFeature {
   type: "Feature";
   id: number;
@@ -14,10 +19,7 @@ export interface GreenSpaceFeature {
     district?: string;
     tags?: Record<string, string>;
   };
-  geometry: {
-    type: "Polygon" | "MultiPolygon";
-    coordinates: number[][][] | number[][][][];
-  };
+  geometry: Geometry;
 }
 
 export interface GreenSpaceCollection {
@@ -44,10 +46,7 @@ export interface GreenSpaceDetailResponse {
   osmType: string;
   name: string | null;
   type: string;
-  geometry: {
-    type: "Polygon" | "MultiPolygon";
-    coordinates: number[][][] | number[][][][];
-  };
+  geometry: Geometry;
   areaSqkm: number;
   district?: string | null;
   city?: string | null;
