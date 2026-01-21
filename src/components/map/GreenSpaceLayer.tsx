@@ -117,11 +117,12 @@ export default function GreenSpaceLayer() {
 
     // Create popup with routing buttons
     const popup = L.popup({
+      minWidth: 300,
       maxWidth: 380,
       closeButton: true,
       className: "custom-leaflet-popup",
     }).setContent(`
-      <div class="p-1 px-1.5 overflow-hidden font-inter">
+      <div class="p-1 px-1.5 overflow-hidden font-inter w-70 sm:w-[320px]">
         <div class="mb-4">
           <h3 class="font-outfit font-bold text-lg text-primary leading-tight m-0 mb-1">${name || "Unnamed"}</h3>
           <div class="flex items-center gap-2 mt-2">
